@@ -1,0 +1,381 @@
+basePath: /
+definitions:
+  balance_app.SignInInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  balance_app.TransactionList:
+    properties:
+      amount:
+        type: number
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+    required:
+    - amount
+    - description
+    - id
+    type: object
+  balance_app.User:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - password
+    - username
+    type: object
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.getAllTransactionsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/balance_app.TransactionList'
+        type: array
+      page:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for Bank Application
+  title: Balance App API
+  version: "1.0"
+paths:
+  /api/balance:
+    get:
+      consumes:
+      - application/json
+      description: The function of getting the user's balance. The default currency
+        is 'RUB'. Optionally, the user can change the currency to any other fiat currency.
+      operationId: get-balance
+      parameters:
+      - description: Currency code (e.g., USD, EUR, etc.) to get the balance in. Default
+          is RUB.
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: GetBalance
+      tags:
+      - user
+  /api/balance/history:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        -----The user can get the transaction history:-----
+        -by the exact amount
+        -by a date interval
+        -by the amount interval
+        -----Sorting is implemented:-----
+        -in ascending order
+        -in descending order
+        -----Implemented pagination:-----
+        -It is necessary to specify the page number.
+        -The maximum number of transactions per page.
+      operationId: history
+      parameters:
+      - description: Sort by (date, amount)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      - description: Sort field (amount, amount_interval, date_interval) amount is
+          for exact value of the amount
+        in: query
+        name: sort_field
+        type: string
+      - description: Exact value of the amount
+        in: query
+        name: exact_value
+        type: string
+      - description: Start value for interval
+        in: query
+        name: start_value
+        type: string
+      - description: End value for interval
+        in: query
+        name: end_value
+        type: string
+      - description: Limit of transactions per page
+        in: query
+        name: limit
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.getAllTransactionsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: GetAllTransactions
+      tags:
+      - transactions
+  /api/balance/transfer:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        The function of transferring money from one user to another.
+        If the sender has a sufficient balance in their account and the recipient has an open account in the application, the transaction will be successful
+      operationId: transfer
+      parameters:
+      - description: balance transfer
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/balance_app.TransactionList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: BalanceTransfer
+      tags:
+      - user
+  /api_admin/balance/deposit:
+    post:
+      consumes:
+      - application/json
+      description: To deposit the user's account by the admin.
+      operationId: deposit
+      parameters:
+      - description: deposit
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/balance_app.TransactionList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Deposit
+      tags:
+      - admin
+  /api_admin/balance/withdraw:
+    post:
+      consumes:
+      - application/json
+      description: To withdraw the user's balance by the admin.
+      operationId: withdraw
+      parameters:
+      - description: withdraw
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/balance_app.TransactionList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Withdraw
+      tags:
+      - admin
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: users login
+      operationId: login
+      parameters:
+      - description: credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/balance_app.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Creation of users account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/balance_app.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
