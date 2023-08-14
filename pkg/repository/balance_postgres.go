@@ -83,7 +83,7 @@ func (r *BalancePostres) Transfer(userId int, pattern balance_app.TransactionLis
 			}
 
 			withdrawAmount := 0 - pattern.Amount
-			description := "transfer to user " + strconv.Itoa(pattern.Id) + " description" + pattern.Description
+			description := "transfer to user " + strconv.Itoa(pattern.Id) + " description: " + pattern.Description
 			createSenderTransactionListQuery := fmt.Sprintf("INSERT INTO %s (user_id, amount, description, date) VALUES ($1, $2, $3, $4)", transactionPatternTable)
 			_, err = tx.Exec(createSenderTransactionListQuery, userId, withdrawAmount, description, SetCurrentTime())
 			if err != nil {
@@ -111,10 +111,9 @@ func (r *BalancePostres) UserChecker(pattern balance_app.TransactionList) error 
 	}
 	return nil
 }
-func SetCurrentTime() string {
+func SetCurrentTime() time.Time {
 	date := time.Now()
-	formattedDate := date.Format("02-01-2006 15:04:05")
-	return formattedDate
+	return date
 }
 
 func (r *BalancePostres) Withdraw(pattern balance_app.TransactionList) (float64, error) {

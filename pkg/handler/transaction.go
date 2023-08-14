@@ -68,11 +68,15 @@ func (h *Handler) getAllTransactions(c *gin.Context) {
 	}
 
 	var requestParameter string
+	var requestOrder string
+
 	switch sortField {
 	case "amount":
 		requestParameter = " AND amount = " + exactValue
+	case "":
+
 	case "amount_interval":
-		requestParameter = fmt.Sprintf(" AND amount >= '%s' AND amount < '%s'", startValue, endValue)
+		requestParameter = fmt.Sprintf(" AND amount >= '%s' AND amount <= '%s'", startValue, endValue)
 	case "date_interval":
 		startDateValue, err := time.Parse("02-01-2006", startValue)
 		if err != nil {
@@ -93,9 +97,9 @@ func (h *Handler) getAllTransactions(c *gin.Context) {
 	}
 	switch sortBy {
 	case "date":
-		requestParameter = " ORDER BY date"
+		requestOrder = " ORDER BY date"
 	case "amount":
-		requestParameter = " ORDER BY amount"
+		requestOrder = " ORDER BY amount"
 	case "":
 
 	default:
@@ -105,9 +109,9 @@ func (h *Handler) getAllTransactions(c *gin.Context) {
 
 	switch sortOrder {
 	case "desc":
-		requestParameter += " DESC "
+		requestOrder += " DESC "
 	case "asc":
-		requestParameter += " ASC "
+		requestOrder += " ASC "
 	case "":
 
 	default:
@@ -136,7 +140,7 @@ func (h *Handler) getAllTransactions(c *gin.Context) {
 
 	transactionOffset := (page - 1) * limit
 
-	transactions, err = h.service.PaginationTransactions(userId, requestParameter, limit, transactionOffset)
+	transactions, err = h.service.PaginationTransactions(userId, requestParameter, requestOrder, limit, transactionOffset)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

@@ -31,9 +31,9 @@ func (r *TransactionHistoryPostgres) GetAllTransactions(userId int, param string
 	return transactions, countOfTransactions, err
 }
 
-func (r *TransactionHistoryPostgres) PaginationTransactions(userId int, param string, limitOfTransactions, offset int) ([]balance_app.TransactionList, error) {
+func (r *TransactionHistoryPostgres) PaginationTransactions(userId int, param, order string, limitOfTransactions, offset int) ([]balance_app.TransactionList, error) {
 	var transactionsWithPagination []balance_app.TransactionList
-	query := fmt.Sprintf("SELECT id, amount, description, date FROM %s WHERE user_id = $1"+param+" LIMIT %d OFFSET %d", transactionPatternTable, limitOfTransactions, offset)
+	query := fmt.Sprintf("SELECT id, amount, description, date FROM %s WHERE user_id = $1 %s %s LIMIT %d OFFSET %d", transactionPatternTable, param, order, limitOfTransactions, offset)
 	err := r.db.Select(&transactionsWithPagination, query, userId)
 	if err != nil {
 		return nil, err

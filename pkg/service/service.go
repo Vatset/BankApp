@@ -20,7 +20,7 @@ type BalanceManipulations interface {
 }
 
 type TransactionHistory interface {
-	PaginationTransactions(userId int, param string, limitOfTransactions, offset int) ([]balance_app.TransactionList, error)
+	PaginationTransactions(userId int, param, order string, limitOfTransactions, offset int) ([]balance_app.TransactionList, error)
 	GetAllTransactions(userId int, param string) ([]balance_app.TransactionList, int, error)
 }
 

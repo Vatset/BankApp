@@ -16,6 +16,6 @@ func NewTransactionHistoryService(repo repository.TransactionHistory) *Transacti
 func (s *TransactionHistoryService) GetAllTransactions(userId int, param string) ([]balance_app.TransactionList, int, error) {
 	return s.repo.GetAllTransactions(userId, param)
 }
-func (s *TransactionHistoryService) PaginationTransactions(userId int, param string, limitOfTransactions, offset int) ([]balance_app.TransactionList, error) {
-	return s.repo.PaginationTransactions(userId, param, limitOfTransactions, offset)
+func (s *TransactionHistoryService) PaginationTransactions(userId int, param, order string, limitOfTransactions, offset int) ([]balance_app.TransactionList, error) {
+	return s.repo.PaginationTransactions(userId, param, order, limitOfTransactions, offset)
 }
