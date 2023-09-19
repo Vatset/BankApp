@@ -1,4 +1,27 @@
-# REST API приложение для работы с балансом пользователей
+# (ENG) REST API application for working with user balances
+
+## Description
+This microservice provides the ability to register new users. When registering, a wallet with an initial balance of 0 is created. The wallet owner can perform the following actions:
+
+- Check their balance (by default, the balance is displayed in rubles, but the user also has the option to convert their balance to any fiat currency).
+- Transfer funds to another user.
+- View transaction history.
+
+Transaction history can be filtered by the following parameters:
+
+- By the exact transaction amount (e.g., 200 rubles).
+- Within a time frame (e.g., from 1.02 to 4.04).
+- In a monetary interval (e.g., transactions amounting from 100 to 500 rubles).
+
+Transaction history can also be sorted:
+- In ascending order.
+- In descending order.
+  
+For the convenience of users, pagination of pages is implemented. When making a request, you need to specify the page number and the maximum number of transactions per page.
+
+The deposit and withdraw methods are implemented through the administrator API since such operations can only be performed by service administrators.
+
+# (RU) REST API приложение для работы с балансом пользователей
 
 ## Описание
 Данный микросервис предоставляет возможность регистрации новых пользователей. При регистрации создается кошелек с начальным балансом 0. Владелец кошелька может осуществлять следующие действия:
@@ -22,19 +45,19 @@
 
 Методы `deposit` и `withdraw` реализованы через API администратора, поскольку подобные операции могут выполнять только администраторы сервиса.
   
-### Используемые инструменты и технологии
+### Used Tools and Technologies // Используемые инструменты и технологии 
 * Golang
 * Gin Web Framework
 * Docker
 * PostgreSQL
 * Swagger
-## Запуск микросервиса
-1. Клонируйте репозиторий
+## Running the Microservice // Запуск микросервиса
+1. Clone the repository // Клонируйте репозиторий
  ```bash
  git clone https://github.com/Vatset/BankApp.git
 ```
-2. Создайте .env файл
-   Пример:
+2. Create a .env file // Создайте .env файл</br>
+   Example: // Пример:
 ```bash
 DB_PASSWORD=yourdbpass
 
@@ -42,32 +65,32 @@ SALT_PASSWORD=salt@1219kq
 
 SIGNING_KEY=signingkeyjju777@
 ```
-3. Подготовка бд к работе<br>
-   *Предварительно скачайте и запустите приложение docker*<br>
+3.  Preparing the database for operation//Подготовка бд к работе<br>
+  *Download and run the Docker application beforehand*// *Предварительно скачайте и запустите приложение docker*<br>
 Получение последней версии postgres
 ```bash   
 docker pull postgres
 ```
-Запуск Docker контейнера с именем "balance-app", используя ранее скачанный образ PostgreSQL. 
+Run the Docker container with the name "balance-app," using the previously downloaded PostgreSQL // Запуск Docker контейнера с именем "balance-app", используя ранее скачанный образ PostgreSQL. 
 ```bash
 docker run --name=balance-app -e POSTGRES_PASSWORD="yourdbpass" -p 5436:5432 -d --rm postgres
 ```
-Выполнение миграций базы данных
+Execute database migrations//Выполнение миграций базы данных
 ```bash 
 migrate -path ./schema  -database 'postgres://postgres:yourdbpass@localhost:5436/postgres?sslmode=disable' up
 ```
-4.Запускаем проект
+4.Launch the project//Запускаем проект
 ```bash   
 go run cmd/main.go
 ```
 
-## Примеры запросов и ответов
-После запуска проекта по адресу http://localhost:8080/swagger/index.html будет доступна документация API
-### Регистрация [POST]
+##  Examples of Requests and Responses//Примеры запросов и ответов
+After running the project, the API documentation will be available at // После запуска проекта по адресу http://localhost:8080/swagger/index.html будет доступна документация API
+### Registration//Регистрация [POST]
 ```bash   
 /auth/sign-up
 ```
-Запрос
+Request//Запрос
 ```bash   
 {
   "name": "Maria",
@@ -80,11 +103,11 @@ go run cmd/main.go
   "id": 1
 }
 ```
-### Авторизация [POST]
+### Authorization//Авторизация [POST]
 ```bash   
 /auth/sign-in
 ```
-Запрос
+Request//Запрос
 ```bash   
 {
   "password": "123",
@@ -96,11 +119,11 @@ go run cmd/main.go
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTIwMzA3OTcsImlhdCI6MTY5MTk4NzU5NywidXNlcklkIjoxfQ.C853vXKfqi1gAbVnO4QbyCBmabpYdkiQbz4ooUbY800"
 }
 ```
-### Пополнитель кошелек пользователя [POST]
+### Add Funds to User's Wallet // Пополнитель кошелек пользователя [POST]
 ```bash   
 /api_admin/balance/deposit
 ```
-Запрос
+Request//Запрос
 ```bash   
 {
   "amount": 100,
@@ -113,11 +136,11 @@ go run cmd/main.go
   "new balance": 100
 }
 ```
-### Списать деньги с кошелька пользователя [POST]
+### Withdraw Money from User's Wallet//Списать деньги с кошелька пользователя [POST]
 ```bash   
 /api_admin/balance/withdraw
 ```
-Запрос
+Request//Запрос
 ```bash   
 {
   "amount": 50,
@@ -130,7 +153,7 @@ go run cmd/main.go
   "new balance": 50
 }
 ```
-### Посмотреть баланс кошелька [GET]
+### View Wallet Balance // Посмотреть баланс кошелька [GET]
 ```bash
 Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTIwMzA3OTcsImlhdCI6MTY5MTk4NzU5NywidXNlcklkIjoxfQ.C853vXKfqi1gAbVnO4QbyCBmabpYdkiQbz4ooUbY800 
 ```
@@ -142,7 +165,7 @@ Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTIwMzA3OT
   "balance": 50
 }
 ```
-### Посмотреть баланс кошелька в другой валюте
+### View Wallet Balance in Another Currency//Посмотреть баланс кошелька в другой валюте
 ```bash   
 /api/balance?currency=USD
 ```
@@ -152,11 +175,11 @@ Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTIwMzA3OT
   "currency": "USD"
 }
 ```
-### Перевод другому пользователю [POST]
+### Transfer to Another User//Перевод другому пользователю [POST]
 ```bash   
 /api/balance/transfer
 ```
-Запрос
+Request//Запрос
 ```bash   
 {
   "amount": 10,
@@ -169,7 +192,7 @@ Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTIwMzA3OT
   "status": "ok"
 }
 ```
-### История транзакций [GET]
+### Transaction History//История транзакций [GET]
 ```bash
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTIwMzA3OTcsImlhdCI6MTY5MTk4NzU5NywidXNlcklkIjoxfQ.C853vXKfqi1gAbVnO4QbyCBmabpYdkiQbz4ooUbY800
 
